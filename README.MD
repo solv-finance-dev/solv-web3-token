@@ -57,7 +57,7 @@ Using [Ethers](https://www.npmjs.com/package/ethers) package:
 
 ```js
 import { ethers } from "ethers";
-import SolvWeb3Token from 'web3-token';
+import SolvWeb3Token from '@solv-protocol/web3-token';
 
 // Connection to MetaMask wallet
 const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -73,7 +73,7 @@ const token = await SolvWeb3Token.sign(async msg => await signer.signMessage(msg
 
 ## Example usage (Server side)
 ```js
-const SolvWeb3Token = require('web3-token');
+const SolvWeb3Token = require('@solv-protocol/web3-token');
 
 // getting token from authorization header ... for example
 const token = req.headers['Authorization']
