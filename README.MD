@@ -38,7 +38,7 @@ Using [Web3](https://www.npmjs.com/package/web3) package:
 
 ```js
 import Web3 from 'web3';
-import Web3Token from 'web3-token';
+import SolvWeb3Token from '@solv-protocol/web3-token';
 
 // Connection to MetaMask wallet
 const web3 = new Web3(ethereum);
@@ -48,7 +48,7 @@ await ethereum.request({ method: 'eth_requestAccounts'});
 const address = (await web3.eth.getAccounts())[0];
 
 // generating a token with 1 day of expiration time
-const token = await Web3Token.sign(msg => web3.eth.personal.sign(msg, address), '1d');
+const token = await SolvWeb3Token.sign(msg => web3.eth.personal.sign(msg, address), '1d');
 
 // attaching token to authorization header ... for example
 ```
@@ -57,14 +57,14 @@ Using [Ethers](https://www.npmjs.com/package/ethers) package:
 
 ```js
 import { ethers } from "ethers";
-import Web3Token from 'web3-token';
+import SolvWeb3Token from 'web3-token';
 
 // Connection to MetaMask wallet
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
 // generating a token with 1 day of expiration time
-const token = await Web3Token.sign(async msg => await signer.signMessage(msg), '1d');
+const token = await SolvWeb3Token.sign(async msg => await signer.signMessage(msg), '1d');
 
 // attaching token to authorization header ... for example
 ```
@@ -73,12 +73,12 @@ const token = await Web3Token.sign(async msg => await signer.signMessage(msg), '
 
 ## Example usage (Server side)
 ```js
-const Web3Token = require('web3-token');
+const SolvWeb3Token = require('web3-token');
 
 // getting token from authorization header ... for example
 const token = req.headers['Authorization']
 
-const { address, body } = await Web3Token.verify(token);
+const { address, body } = await SolvWeb3Token.verify(token);
 
 // now you can find that user by his address 
 // (better to do it case insensitive)
@@ -99,7 +99,7 @@ const generateToken = async () => {
   const signer = provider.getSigner();
 
   try {
-    return await Web3Token.sign(async msg => {
+    return await SolvWeb3Token.sign(async msg => {
       try {
         return await signer.signMessage(msg);
       }
@@ -127,7 +127,7 @@ const generateToken = async () => {
 
 // I assume here a lot of things to be imported 😀
 
-const token = await Web3Token.sign(async msg => await signer.signMessage(msg), {
+const token = await SolvWeb3Token.sign(async msg => await signer.signMessage(msg), {
   domain: 'worldofdefish.com',
   statement: 'I accept the WoD Terms of Service: https://service.org/tos',
   expires_in: '3 days',
@@ -136,7 +136,7 @@ const token = await Web3Token.sign(async msg => await signer.signMessage(msg), {
   nonce: 11111111,
 });
 
-const { address, body } = await Web3Token.verify(token, {
+const { address, body } = await SolvWeb3Token.verify(token, {
   // verify that received token is signed only for our domain
   domain: 'worldofdefish.com'
 });
