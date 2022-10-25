@@ -19,17 +19,16 @@ Web3 Token is a new way to authenticate users. See [this article](https://medium
 ---
 ## Install
 
-With [web3](https://www.npmjs.com/package/web3) package:
-
 ```bash
-
+yarn add @solv-protocol/web3-token@git+ssh://git@github.com:solv-finance-dev/solv-web3-token.git
 ```
 
-or with [ethers](https://www.npmjs.com/package/ethers) package:
+or
 
 ```bash
-
+npm install @solv-protocol/web3-token@git+ssh://git@github.com:solv-finance-dev/solv-web3-token.git
 ```
+
 
 ---
 
