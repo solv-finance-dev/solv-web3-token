@@ -433,11 +433,6 @@ var isValidString = function isValidString(val) {
   return typeof val === 'string' && !!val.length;
 };
 var validateParams = function validateParams(params) {
-  for (var key in params) {
-    if (typeof params[key] === 'string' && /\n/.test(params[key])) {
-      throw new Error("\"" + key + "\" option cannot have LF (\\n)");
-    }
-  }
   if (params.domain && (!isValidString(params.domain) || !isValidDomain(params.domain))) {
     throw new Error('Invalid domain format (must be example.com)');
   }
@@ -501,10 +496,10 @@ var buildMessage = function buildMessage(params) {
     message.push('');
   }
   var param_labels = {
-    'URI': params.uri,
+    URI: params.uri,
     'Web3 Token Version': params.web3_token_version,
     'Chain ID': params.chain_id,
-    'Nonce': params.nonce,
+    Nonce: params.nonce,
     'Issued At': params.issued_at.toISOString(),
     'Expiration Time': params.expiration_time.toISOString(),
     'Not Before': params.not_before ? params.not_before.toISOString() : undefined,
