@@ -42,6 +42,7 @@ export interface DecrypterResult {
 
 export interface VerifyOpts {
     domain?: string;
+    address?: string; //multi sign wallet address
 }
 
 export interface DecryptedBody {

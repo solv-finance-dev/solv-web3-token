@@ -77,9 +77,11 @@ const parseBody = (lines: string[]): DecryptedBody => {
     return parsed_body;
 }
 
-export const verify = (token: string, opts: VerifyOpts = {}) => {
+export const verify = (token: string, opts: VerifyOpts = {
+    address: ''
+}) => {
 
-    const { version, address, body } = decrypt(token);
+    const { version, address, body } = decrypt(token, opts.address);
 
     if (version === 1) {
         throw new Error('Tokens version 1 are not supported by the current version of module')

@@ -34,6 +34,7 @@ export interface DecrypterResult {
 }
 export interface VerifyOpts {
     domain?: string;
+    address?: string;
 }
 export interface DecryptedBody {
     'uri'?: string;

@@ -2,7 +2,7 @@ import Base64 from 'base-64';
 import ms from 'ms';
 import isValidDomain from 'is-valid-domain';
 import parseAsHeaders from 'parse-headers';
-import { toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
+import { toBuffer, hashPersonalMessage, fromRpcSig, isValidAddress, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
 import toHex from 'to-hex';
 
 function _regeneratorRuntime() {
@@ -512,7 +512,10 @@ var getVersion = function getVersion(body) {
     str = _body$match[0];
   return Number(str.replace(' ', '').split(':')[1]);
 };
-var decrypt = function decrypt(token) {
+var decrypt = function decrypt(token, contractSignerAddress) {
+  if (contractSignerAddress === void 0) {
+    contractSignerAddress = '';
+  }
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
@@ -538,9 +541,13 @@ var decrypt = function decrypt(token) {
   var msgHash = hashPersonalMessage(msgBuffer);
   var signatureBuffer = toBuffer(signature);
   var signatureParams = fromRpcSig(signatureBuffer);
-  var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
-  var addressBuffer = publicToAddress(publicKey);
-  var address = bufferToHex(addressBuffer).toLowerCase();
+  var address = contractSignerAddress;
+  if (!isValidAddress(contractSignerAddress)) {
+    var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+    var addressBuffer = publicToAddress(publicKey);
+    var userAddress = bufferToHex(addressBuffer).toLowerCase();
+    address = userAddress;
+  }
   var version = getVersion(body);
   return {
     version: version,
@@ -606,9 +613,11 @@ var parseBody = function parseBody(lines) {
 };
 var verify = function verify(token, opts) {
   if (opts === void 0) {
-    opts = {};
+    opts = {
+      address: ''
+    };
   }
-  var _decrypt = decrypt(token),
+  var _decrypt = decrypt(token, opts.address),
     version = _decrypt.version,
     address = _decrypt.address,
     body = _decrypt.body;

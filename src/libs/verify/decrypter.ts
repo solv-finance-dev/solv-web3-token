@@ -5,7 +5,8 @@ import {
     fromRpcSig,
     ecrecover,
     publicToAddress,
-    bufferToHex
+    bufferToHex,
+    isValidAddress
 } from 'ethereumjs-util';
 import toHex from 'to-hex';
 import { DecrypterResult } from '../interfaces';
@@ -17,7 +18,7 @@ const getVersion = (body: string): number => {
     return Number(str.replace(' ', '').split(':')[1]);
 }
 
-export const decrypt = (token: string): DecrypterResult => {
+export const decrypt = (token: string, contractSignerAddress: string = ''): DecrypterResult => {
     if (!token || !token.length) {
         throw new Error('Token required.')
     }
@@ -49,15 +50,18 @@ export const decrypt = (token: string): DecrypterResult => {
     const signatureBuffer = toBuffer(signature);
     const signatureParams = fromRpcSig(signatureBuffer as any);
 
-    const publicKey = ecrecover(
-        msgHash,
-        signatureParams.v,
-        signatureParams.r,
-        signatureParams.s
-    );
-    const addressBuffer = publicToAddress(publicKey);
-    const address = bufferToHex(addressBuffer).toLowerCase();
-
+    let address: string = contractSignerAddress;
+    if (!isValidAddress(contractSignerAddress)) {
+        const publicKey = ecrecover(
+            msgHash,
+            signatureParams.v,
+            signatureParams.r,
+            signatureParams.s
+        );
+        const addressBuffer = publicToAddress(publicKey);
+        const userAddress = bufferToHex(addressBuffer).toLowerCase();
+        address = userAddress;
+    }
     const version = getVersion(body);
 
     return {

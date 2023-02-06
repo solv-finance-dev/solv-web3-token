@@ -518,7 +518,10 @@ var getVersion = function getVersion(body) {
     str = _body$match[0];
   return Number(str.replace(' ', '').split(':')[1]);
 };
-var decrypt = function decrypt(token) {
+var decrypt = function decrypt(token, contractSignerAddress) {
+  if (contractSignerAddress === void 0) {
+    contractSignerAddress = '';
+  }
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
@@ -544,9 +547,13 @@ var decrypt = function decrypt(token) {
   var msgHash = ethereumjsUtil.hashPersonalMessage(msgBuffer);
   var signatureBuffer = ethereumjsUtil.toBuffer(signature);
   var signatureParams = ethereumjsUtil.fromRpcSig(signatureBuffer);
-  var publicKey = ethereumjsUtil.ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
-  var addressBuffer = ethereumjsUtil.publicToAddress(publicKey);
-  var address = ethereumjsUtil.bufferToHex(addressBuffer).toLowerCase();
+  var address = contractSignerAddress;
+  if (!ethereumjsUtil.isValidAddress(contractSignerAddress)) {
+    var publicKey = ethereumjsUtil.ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+    var addressBuffer = ethereumjsUtil.publicToAddress(publicKey);
+    var userAddress = ethereumjsUtil.bufferToHex(addressBuffer).toLowerCase();
+    address = userAddress;
+  }
   var version = getVersion(body);
   return {
     version: version,
@@ -612,9 +619,11 @@ var parseBody = function parseBody(lines) {
 };
 var verify = function verify(token, opts) {
   if (opts === void 0) {
-    opts = {};
+    opts = {
+      address: ''
+    };
   }
-  var _decrypt = decrypt(token),
+  var _decrypt = decrypt(token, opts.address),
     version = _decrypt.version,
     address = _decrypt.address,
     body = _decrypt.body;
