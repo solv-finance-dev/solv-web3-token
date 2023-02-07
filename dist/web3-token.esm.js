@@ -2,7 +2,7 @@ import Base64 from 'base-64';
 import ms from 'ms';
 import isValidDomain from 'is-valid-domain';
 import parseAsHeaders from 'parse-headers';
-import { toBuffer, hashPersonalMessage, fromRpcSig, isValidAddress, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
+import { isValidAddress, toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
 import toHex from 'to-hex';
 
 function _regeneratorRuntime() {
@@ -519,6 +519,7 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
+  var address = contractSignerAddress;
   var base64_decoded = Base64.decode(token);
   if (!base64_decoded || !base64_decoded.length) {
     throw new Error('Token malformed (must be base64 encoded)');
@@ -534,15 +535,14 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if (!signature || !signature.length) {
-    throw new Error('Token malformed (empty signature)');
-  }
-  var msgBuffer = toBuffer('0x' + toHex(body));
-  var msgHash = hashPersonalMessage(msgBuffer);
-  var signatureBuffer = toBuffer(signature);
-  var signatureParams = fromRpcSig(signatureBuffer);
-  var address = contractSignerAddress;
   if (!isValidAddress(contractSignerAddress)) {
+    if (!signature || !signature.length) {
+      throw new Error('Token malformed (empty signature)');
+    }
+    var msgBuffer = toBuffer('0x' + toHex(body));
+    var msgHash = hashPersonalMessage(msgBuffer);
+    var signatureBuffer = toBuffer(signature);
+    var signatureParams = fromRpcSig(signatureBuffer);
     var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
     var addressBuffer = publicToAddress(publicKey);
     var userAddress = bufferToHex(addressBuffer).toLowerCase();

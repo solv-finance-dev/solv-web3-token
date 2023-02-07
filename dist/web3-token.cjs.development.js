@@ -525,6 +525,7 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
+  var address = contractSignerAddress;
   var base64_decoded = Base64.decode(token);
   if (!base64_decoded || !base64_decoded.length) {
     throw new Error('Token malformed (must be base64 encoded)');
@@ -540,15 +541,14 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if (!signature || !signature.length) {
-    throw new Error('Token malformed (empty signature)');
-  }
-  var msgBuffer = ethereumjsUtil.toBuffer('0x' + toHex(body));
-  var msgHash = ethereumjsUtil.hashPersonalMessage(msgBuffer);
-  var signatureBuffer = ethereumjsUtil.toBuffer(signature);
-  var signatureParams = ethereumjsUtil.fromRpcSig(signatureBuffer);
-  var address = contractSignerAddress;
   if (!ethereumjsUtil.isValidAddress(contractSignerAddress)) {
+    if (!signature || !signature.length) {
+      throw new Error('Token malformed (empty signature)');
+    }
+    var msgBuffer = ethereumjsUtil.toBuffer('0x' + toHex(body));
+    var msgHash = ethereumjsUtil.hashPersonalMessage(msgBuffer);
+    var signatureBuffer = ethereumjsUtil.toBuffer(signature);
+    var signatureParams = ethereumjsUtil.fromRpcSig(signatureBuffer);
     var publicKey = ethereumjsUtil.ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
     var addressBuffer = ethereumjsUtil.publicToAddress(publicKey);
     var userAddress = ethereumjsUtil.bufferToHex(addressBuffer).toLowerCase();

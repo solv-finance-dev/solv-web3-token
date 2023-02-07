@@ -22,7 +22,7 @@ export const decrypt = (token: string, contractSignerAddress: string = ''): Decr
     if (!token || !token.length) {
         throw new Error('Token required.')
     }
-
+    let address: string = contractSignerAddress;
     const base64_decoded = Base64.decode(token);
 
     if (!base64_decoded || !base64_decoded.length) {
@@ -40,18 +40,17 @@ export const decrypt = (token: string, contractSignerAddress: string = ''): Decr
     if (!body || !body.length) {
         throw new Error('Token malformed (empty message)')
     }
-
-    if (!signature || !signature.length) {
-        throw new Error('Token malformed (empty signature)')
-    }
-
-    const msgBuffer = toBuffer('0x' + toHex(body));
-    const msgHash = hashPersonalMessage(msgBuffer);
-    const signatureBuffer = toBuffer(signature);
-    const signatureParams = fromRpcSig(signatureBuffer as any);
-
-    let address: string = contractSignerAddress;
     if (!isValidAddress(contractSignerAddress)) {
+        if (!signature || !signature.length) {
+            throw new Error('Token malformed (empty signature)')
+        }
+
+        const msgBuffer = toBuffer('0x' + toHex(body));
+        const msgHash = hashPersonalMessage(msgBuffer);
+        const signatureBuffer = toBuffer(signature);
+        const signatureParams = fromRpcSig(signatureBuffer as any);
+
+
         const publicKey = ecrecover(
             msgHash,
             signatureParams.v,
