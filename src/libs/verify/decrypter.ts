@@ -32,7 +32,6 @@ export const decrypt = (token: string, contractSignerAddress: string = ''): Decr
 
     try {
         ({ body, signature } = JSON.parse(base64_decoded));
-        console.log('web3 token signature', signature, contractSignerAddress)
     } catch (error) {
         throw new Error('Token malformed (unparsable JSON)')
     }
@@ -40,7 +39,7 @@ export const decrypt = (token: string, contractSignerAddress: string = ''): Decr
     if (!body || !body.length) {
         throw new Error('Token malformed (empty message)')
     }
-    if ('' == contractSignerAddress && '0x' != signature) {
+    if ('' == contractSignerAddress) {
         if (!signature || !signature.length) {
             throw new Error('Token malformed (empty signature)')
         }

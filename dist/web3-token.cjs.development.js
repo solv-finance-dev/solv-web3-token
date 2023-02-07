@@ -535,14 +535,13 @@ var decrypt = function decrypt(token, contractSignerAddress) {
     var _JSON$parse = JSON.parse(base64_decoded);
     body = _JSON$parse.body;
     signature = _JSON$parse.signature;
-    console.log('web3 token signature', signature, contractSignerAddress);
   } catch (error) {
     throw new Error('Token malformed (unparsable JSON)');
   }
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if ('' == contractSignerAddress && '0x' != signature) {
+  if ('' == contractSignerAddress) {
     if (!signature || !signature.length) {
       throw new Error('Token malformed (empty signature)');
     }
