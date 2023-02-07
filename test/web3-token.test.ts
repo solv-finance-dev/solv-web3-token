@@ -17,7 +17,9 @@ describe('solv web3 token', () => {
 
       console.log('sig:' + token);
 
-      const { address, body } = await SolvWeb3Token.verify(token);
+      const { address, body } = await SolvWeb3Token.verify(token, {
+        address: ''
+      });
 
       console.log('address, body', address, body);
     } else {
