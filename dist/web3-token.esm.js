@@ -2,7 +2,7 @@ import Base64 from 'base-64';
 import ms from 'ms';
 import isValidDomain from 'is-valid-domain';
 import parseAsHeaders from 'parse-headers';
-import { isValidAddress, toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
+import { toBuffer, hashPersonalMessage, fromRpcSig, ecrecover, publicToAddress, bufferToHex } from 'ethereumjs-util';
 import toHex from 'to-hex';
 
 function _regeneratorRuntime() {
@@ -535,7 +535,7 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if (!isValidAddress(contractSignerAddress)) {
+  if ('' == contractSignerAddress) {
     if (!signature || !signature.length) {
       throw new Error('Token malformed (empty signature)');
     }

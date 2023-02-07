@@ -5,8 +5,7 @@ import {
     fromRpcSig,
     ecrecover,
     publicToAddress,
-    bufferToHex,
-    isValidAddress
+    bufferToHex
 } from 'ethereumjs-util';
 import toHex from 'to-hex';
 import { DecrypterResult } from '../interfaces';
@@ -40,7 +39,7 @@ export const decrypt = (token: string, contractSignerAddress: string = ''): Decr
     if (!body || !body.length) {
         throw new Error('Token malformed (empty message)')
     }
-    if (!isValidAddress(contractSignerAddress)) {
+    if ('' == contractSignerAddress) {
         if (!signature || !signature.length) {
             throw new Error('Token malformed (empty signature)')
         }

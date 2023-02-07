@@ -541,7 +541,7 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if (!ethereumjsUtil.isValidAddress(contractSignerAddress)) {
+  if ('' == contractSignerAddress) {
     if (!signature || !signature.length) {
       throw new Error('Token malformed (empty signature)');
     }
