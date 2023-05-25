@@ -576,8 +576,10 @@ var erc1271Decrypt = function erc1271Decrypt(token, safeMessageHash) {
   }
   var msgHash = toBuffer(safeMessageHash);
   var signatureBuffer = toBuffer(signature);
-  var signatureParams = fromRpcSig(signatureBuffer);
-  var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+  var v = Number(signatureBuffer[64]);
+  var r = signatureBuffer.slice(0, 32);
+  var s = signatureBuffer.slice(32, 64);
+  var publicKey = ecrecover(msgHash, v, r, s);
   var addressBuffer = publicToAddress(publicKey);
   var userAddress = bufferToHex(addressBuffer).toLowerCase();
   var address = userAddress;

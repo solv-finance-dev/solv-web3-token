@@ -95,14 +95,16 @@ export const erc1271Decrypt = (token: string, safeMessageHash: string): Decrypte
 
     const msgHash = toBuffer(safeMessageHash);
     const signatureBuffer = toBuffer(signature);
-    const signatureParams = fromRpcSig(signatureBuffer as any);
 
+    const v: number = Number(signatureBuffer[64]);
+    const r: any = signatureBuffer.slice(0, 32);
+    const s: any = signatureBuffer.slice(32, 64);
 
     const publicKey = ecrecover(
         msgHash,
-        signatureParams.v,
-        signatureParams.r,
-        signatureParams.s
+        v,
+        r,
+        s
     );
     const addressBuffer = publicToAddress(publicKey);
     const userAddress = bufferToHex(addressBuffer).toLowerCase();

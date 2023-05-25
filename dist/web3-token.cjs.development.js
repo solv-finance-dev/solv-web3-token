@@ -582,8 +582,10 @@ var erc1271Decrypt = function erc1271Decrypt(token, safeMessageHash) {
   }
   var msgHash = ethereumjsUtil.toBuffer(safeMessageHash);
   var signatureBuffer = ethereumjsUtil.toBuffer(signature);
-  var signatureParams = ethereumjsUtil.fromRpcSig(signatureBuffer);
-  var publicKey = ethereumjsUtil.ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+  var v = Number(signatureBuffer[64]);
+  var r = signatureBuffer.slice(0, 32);
+  var s = signatureBuffer.slice(32, 64);
+  var publicKey = ethereumjsUtil.ecrecover(msgHash, v, r, s);
   var addressBuffer = ethereumjsUtil.publicToAddress(publicKey);
   var userAddress = ethereumjsUtil.bufferToHex(addressBuffer).toLowerCase();
   var address = userAddress;
