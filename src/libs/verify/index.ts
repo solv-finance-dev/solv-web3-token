@@ -1,6 +1,6 @@
 import parseAsHeaders from 'parse-headers';
 import { DecryptedBody, MessageSections, VerifyOpts } from '../interfaces';
-import { decrypt } from './decrypter';
+import { decrypt, erc1271Decrypt } from './decrypter';
 
 const getDomain = (sections: MessageSections): string | undefined => {
     if (/ wants you to sign in with your Ethereum account\.$/.test(sections[0][0])) {
@@ -78,10 +78,10 @@ const parseBody = (lines: string[]): DecryptedBody => {
 }
 
 export const verify = (token: string, opts: VerifyOpts = {
-    address: ''
+    isERC1271: false
 }) => {
 
-    const { version, address, body } = decrypt(token, opts.address);
+    const { version, address, body } = opts.isERC1271 ? erc1271Decrypt(token, opts?.safeMessageHash ?? '') : decrypt(token);
 
     if (version === 1) {
         throw new Error('Tokens version 1 are not supported by the current version of module')

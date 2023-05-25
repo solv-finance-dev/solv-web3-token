@@ -42,7 +42,8 @@ export interface DecrypterResult {
 
 export interface VerifyOpts {
     domain?: string;
-    address?: string; //multi sign wallet address
+    isERC1271?: boolean; //multi sign wallet address
+    safeMessageHash?: string;
 }
 
 export interface DecryptedBody {

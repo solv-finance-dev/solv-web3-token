@@ -34,7 +34,8 @@ export interface DecrypterResult {
 }
 export interface VerifyOpts {
     domain?: string;
-    address?: string;
+    isERC1271?: boolean;
+    safeMessageHash?: string;
 }
 export interface DecryptedBody {
     'uri'?: string;

@@ -512,14 +512,10 @@ var getVersion = function getVersion(body) {
     str = _body$match[0];
   return Number(str.replace(' ', '').split(':')[1]);
 };
-var decrypt = function decrypt(token, contractSignerAddress) {
-  if (contractSignerAddress === void 0) {
-    contractSignerAddress = '';
-  }
+var decrypt = function decrypt(token) {
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
-  var address = contractSignerAddress;
   var base64_decoded = Base64.decode(token);
   if (!base64_decoded || !base64_decoded.length) {
     throw new Error('Token malformed (must be base64 encoded)');
@@ -535,19 +531,56 @@ var decrypt = function decrypt(token, contractSignerAddress) {
   if (!body || !body.length) {
     throw new Error('Token malformed (empty message)');
   }
-  if ('' == contractSignerAddress) {
-    if (!signature || !signature.length) {
-      throw new Error('Token malformed (empty signature)');
-    }
-    var msgBuffer = toBuffer('0x' + toHex(body));
-    var msgHash = hashPersonalMessage(msgBuffer);
-    var signatureBuffer = toBuffer(signature);
-    var signatureParams = fromRpcSig(signatureBuffer);
-    var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
-    var addressBuffer = publicToAddress(publicKey);
-    var userAddress = bufferToHex(addressBuffer).toLowerCase();
-    address = userAddress;
+  console.log('body', body);
+  if (!signature || !signature.length) {
+    throw new Error('Token malformed (empty signature)');
   }
+  var msgBuffer = toBuffer('0x' + toHex(body));
+  var msgHash = hashPersonalMessage(msgBuffer);
+  var signatureBuffer = toBuffer(signature);
+  var signatureParams = fromRpcSig(signatureBuffer);
+  var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+  var addressBuffer = publicToAddress(publicKey);
+  var userAddress = bufferToHex(addressBuffer).toLowerCase();
+  var address = userAddress;
+  var version = getVersion(body);
+  return {
+    version: version,
+    address: address,
+    body: body,
+    signature: signature
+  };
+};
+var erc1271Decrypt = function erc1271Decrypt(token, safeMessageHash) {
+  if (!token || !token.length) {
+    throw new Error('Token required.');
+  }
+  var base64_decoded = Base64.decode(token);
+  if (!base64_decoded || !base64_decoded.length) {
+    throw new Error('Token malformed (must be base64 encoded)');
+  }
+  var body, signature;
+  try {
+    var _JSON$parse2 = JSON.parse(base64_decoded);
+    body = _JSON$parse2.body;
+    signature = _JSON$parse2.signature;
+  } catch (error) {
+    throw new Error('Token malformed (unparsable JSON)');
+  }
+  if (!body || !body.length) {
+    throw new Error('Token malformed (empty message)');
+  }
+  console.log('body', body);
+  if (!signature || !signature.length) {
+    throw new Error('Token malformed (empty signature)');
+  }
+  var msgHash = toBuffer(safeMessageHash);
+  var signatureBuffer = toBuffer(signature);
+  var signatureParams = fromRpcSig(signatureBuffer);
+  var publicKey = ecrecover(msgHash, signatureParams.v, signatureParams.r, signatureParams.s);
+  var addressBuffer = publicToAddress(publicKey);
+  var userAddress = bufferToHex(addressBuffer).toLowerCase();
+  var address = userAddress;
   var version = getVersion(body);
   return {
     version: version,
@@ -612,15 +645,16 @@ var parseBody = function parseBody(lines) {
   return parsed_body;
 };
 var verify = function verify(token, opts) {
+  var _opts$safeMessageHash, _opts;
   if (opts === void 0) {
     opts = {
-      address: ''
+      isERC1271: false
     };
   }
-  var _decrypt = decrypt(token, opts.address),
-    version = _decrypt.version,
-    address = _decrypt.address,
-    body = _decrypt.body;
+  var _ref = opts.isERC1271 ? erc1271Decrypt(token, (_opts$safeMessageHash = (_opts = opts) == null ? void 0 : _opts.safeMessageHash) != null ? _opts$safeMessageHash : '') : decrypt(token),
+    version = _ref.version,
+    address = _ref.address,
+    body = _ref.body;
   if (version === 1) {
     throw new Error('Tokens version 1 are not supported by the current version of module');
   }
