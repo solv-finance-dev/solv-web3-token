@@ -69,6 +69,7 @@ export const decrypt = (token: string): DecrypterResult => {
 }
 
 export const erc1271Decrypt = (token: string, safeMessageHash: string): DecrypterResult => {
+    console.log('erc1271Decrypt', safeMessageHash);
     if (!token || !token.length) {
         throw new Error('Token required.')
     }

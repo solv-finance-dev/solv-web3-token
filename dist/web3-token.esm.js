@@ -552,6 +552,7 @@ var decrypt = function decrypt(token) {
   };
 };
 var erc1271Decrypt = function erc1271Decrypt(token, safeMessageHash) {
+  console.log('erc1271Decrypt', safeMessageHash);
   if (!token || !token.length) {
     throw new Error('Token required.');
   }
