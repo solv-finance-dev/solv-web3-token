@@ -1,8 +1,7 @@
 {
-    "name": "@solv-protocol/web3-token",
+    "name": "@solvprotocol/web3-token",
     "license": "MIT",
     "version": "0.1.3",
-    "private": true,
     "description": "🛠 Based on bytesbay/web3-token.",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
